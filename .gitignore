@@ -1,0 +1,5 @@
+*.rbxmx
+*.rbxm
+sourcemap.json
+*.vscode
+Ignore/
