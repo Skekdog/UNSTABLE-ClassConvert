@@ -1,5 +1,7 @@
 local Selection = game:GetService("Selection")
+local StudioService = game:GetService("StudioService")
 local GetPlugin = require("../Lib/GetPlugin")
+local Levenshtein = require("../Lib/Levenshtein")
 local Reflection = require("../Lib/Reflection")
 local Convert = require("./Convert")
 
@@ -214,6 +216,40 @@ do
 	end
 end
 
+local function updateSearch()
+	local text = searchBar.Text:lower()
+	local visibleElements: {TextButton} = {}
+	for _, v in resultsGrid:GetChildren() do
+		if not v:IsA("TextButton") then
+			continue
+		end
+		if (not showDeprecated) and v:GetAttribute("Deprecated") then
+			v.Visible = false
+			continue
+		end
+		if (not showNonBrowsable) and v:GetAttribute("NonBrowsable") then
+			v.Visible = false
+			continue
+		end
+		if v.Name:lower():match(text) then
+			v.Visible = true
+			table.insert(visibleElements, v)
+		else
+			v.Visible = false
+		end
+	end
+	
+	table.sort(visibleElements, function(a, b)
+		return Levenshtein(a.Name:lower(), text) < Levenshtein(b.Name:lower(), text)
+	end)
+	
+	for i, v in visibleElements do
+		v.LayoutOrder = i
+	end
+end
+
+searchBar:GetPropertyChangedSignal("Text"):Connect(updateSearch)
+
 frame.Parent = widget
 
 local function convert(to: string): ()
@@ -223,23 +259,68 @@ local function convert(to: string): ()
 	end
 end
 
+local function setIcon(imageLabel: ImageLabel, class: Reflection.Class): ()
+	local iconData = StudioService:GetClassIcon(class.Name)
+	for k, v in iconData do
+		(imageLabel :: any)[k] = v
+	end
+end
+
+local function syncOne(v: GuiObject, theme: any)
+	if v:IsA("ImageLabel") then
+		setIcon(v, Reflection.GetClass((v.Parent or error("No parent")).Name))
+	elseif v.Name == "Separator" and v.ClassName == "Frame" then
+		v.BackgroundColor3 = theme:GetColor(Enum.StudioStyleGuideColor.MainText)
+	elseif v.Name == "Results" and v.ClassName == "ScrollingFrame" then
+		v.BorderColor3 = theme:GetColor(Enum.StudioStyleGuideColor.MainText)
+	else
+		assert(v:IsA("TextLabel") or v:IsA("TextButton") or v:IsA("TextBox"));
+		(v :: TextLabel).BackgroundColor3 = theme:GetColor(Enum.StudioStyleGuideColor.ScriptEditorCurrentLine);
+		(v :: TextLabel).TextColor3 = theme:GetColor(Enum.StudioStyleGuideColor.MainText)
+	end
+end
+
 local function addClass(class: Reflection.Class): ()
-	local result = resultBase:Clone();
-	(result:FindFirstChild("Label") :: TextLabel).Text = class.Name
+	local result = resultBase:Clone()
+	local label = result:FindFirstChild("Label") :: TextLabel
+	local icon = result:FindFirstChild("Icon") :: ImageLabel
+
+	label.Text = class.Name
 	result:SetAttribute("Deprecated", false)
 	result:SetAttribute("NonBrowsable", false)
 	result.Name = class.Name
+
 	result.Parent = resultsGrid
+
 	table.insert(colourSyncTargets, result)
-	table.insert(colourSyncTargets, result:FindFirstChild("Label") :: TextLabel)
-	table.insert(colourSyncTargets, result:FindFirstChild("Icon") :: ImageLabel)
+	table.insert(colourSyncTargets, label)
+	table.insert(colourSyncTargets, icon)
+
+	syncOne(result, settings().Studio.Theme)
+	syncOne(label, settings().Studio.Theme)
+	syncOne(icon, settings().Studio.Theme)
+
 	result.MouseButton1Click:Connect(function()
 		convert(class.Name)
 	end)
 end
 
-function module.PopulateClasses(classes: {Reflection.Class}): ()
+local function syncColours()
+	local theme = settings().Studio.Theme
+	for _, v in colourSyncTargets do
+		syncOne(v, theme)
+	end
+end
+
+syncColours()
+settings().Studio.ThemeChanged:Connect(syncColours)
+
+function module.PopulateClasses(): ()
+	local classes = Reflection.GetClasses()
 	for _, class in classes do
+		if not class.Permits.New then
+			continue
+		end
 		addClass(class)
 	end
 end

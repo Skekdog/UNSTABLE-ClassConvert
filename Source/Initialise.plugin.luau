@@ -8,11 +8,10 @@ if not RunService:IsServer() and not RunService:IsEdit() then
 	return
 end
 
-local Reflection = require("./Lib/Reflection")
 local Toolbar = require("./Plugin/Toolbar")
 local Widget = require("./Plugin/Widget")
 
-Widget.PopulateClasses(Reflection.GetClasses())
+Widget.PopulateClasses()
 
 Toolbar.OnClick = function()
 	Widget.Widget.Enabled = true
