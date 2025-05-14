@@ -53,81 +53,6 @@ do
 	table.insert(colourSyncTargets, separator)
 end
 
-local showDeprecatedFrame = Instance.new("Frame")
-showDeprecatedFrame.BackgroundTransparency = 1
-showDeprecatedFrame.Size = UDim2.fromScale(1, 0.075)
-showDeprecatedFrame.LayoutOrder = 1
-showDeprecatedFrame.Name = "ShowDeprecated"
-showDeprecatedFrame.Parent = frame
-
-local showDeprecatedButton = Instance.new("ImageButton")
-showDeprecatedButton.BackgroundTransparency = 1
-showDeprecatedButton.Image = if plugin:GetSetting("ShowDeprecated") then "rbxasset://studio_svg_textures/Shared/Utility/Light/Standard/CheckboxOn@3x.png" else "rbxasset://studio_svg_textures/Shared/Utility/Light/Standard/CheckboxOff@3x.png"
-showDeprecatedButton.Name = "Checkbox"
-showDeprecatedButton.Size = UDim2.fromScale(1, 1)
-showDeprecatedButton.Parent = showDeprecatedFrame
-
-do
-	local label = Instance.new("TextLabel")
-	label.Text = "Show Deprecated"
-	label.TextScaled = true
-	label.Font = Enum.Font.SourceSans
-	label.BackgroundTransparency = 1
-	label.Size = UDim2.fromScale(1, 1)
-	label.Name = "Label"
-	label.Parent = showDeprecatedFrame
-	label.TextXAlignment = Enum.TextXAlignment.Left
-	table.insert(colourSyncTargets, label)
-	
-	local list = Instance.new("UIListLayout")
-	list.FillDirection = Enum.FillDirection.Horizontal
-	list.SortOrder = Enum.SortOrder.LayoutOrder
-	list.Padding = UDim.new(0, 10)
-	list.Parent = showDeprecatedFrame
-	
-	local aspectRatio = Instance.new("UIAspectRatioConstraint")
-	aspectRatio.DominantAxis = Enum.DominantAxis.Height
-	aspectRatio.Parent = showDeprecatedButton
-end
-
-local showNonBrowsableFrame = Instance.new("Frame")
-showNonBrowsableFrame.BackgroundTransparency = 1
-showNonBrowsableFrame.Size = UDim2.fromScale(1, 0.075)
-showNonBrowsableFrame.LayoutOrder = 2
-showNonBrowsableFrame.Name = "ShowNonBrowsable"
-showNonBrowsableFrame.Parent = frame
-
-local showNonBrowsableButton = Instance.new("ImageButton")
-showNonBrowsableButton.BackgroundTransparency = 1
-showNonBrowsableButton.Image = if showNonBrowsable then "rbxasset://studio_svg_textures/Shared/Utility/Light/Standard/CheckboxOn@3x.png" else "rbxasset://studio_svg_textures/Shared/Utility/Light/Standard/CheckboxOff@3x.png"
-showNonBrowsableButton.Name = "Checkbox"
-showNonBrowsableButton.Size = UDim2.fromScale(1, 1)
-showNonBrowsableButton.Parent = showNonBrowsableFrame
-
-do
-	local label = Instance.new("TextLabel")
-	label.Text = "Show Non-Browsable"
-	label.TextScaled = true
-	label.Font = Enum.Font.SourceSans
-	label.BackgroundTransparency = 1
-	label.Size = UDim2.fromScale(1, 1)
-	label.Name = "Label"
-	label.TextXAlignment = Enum.TextXAlignment.Left
-	label.Parent = showNonBrowsableFrame
-	table.insert(colourSyncTargets, label)
-
-	local list = Instance.new("UIListLayout")
-	list.FillDirection = Enum.FillDirection.Horizontal
-	list.SortOrder = Enum.SortOrder.LayoutOrder
-	list.Padding = UDim.new(0, 10)
-	list.Parent = showNonBrowsableFrame
-
-	local aspectRatio = Instance.new("UIAspectRatioConstraint")
-	aspectRatio.DominantAxis = Enum.DominantAxis.Height
-	aspectRatio.Parent = showNonBrowsableButton
-end
-
-
 local searchBar = Instance.new("TextBox")
 searchBar.Font = Enum.Font.SourceSans
 searchBar.AnchorPoint = Vector2.new(0.5, 0)
@@ -221,14 +146,6 @@ local function updateSearch()
 	local visibleElements: {TextButton} = {}
 	for _, v in resultsGrid:GetChildren() do
 		if not v:IsA("TextButton") then
-			continue
-		end
-		if (not showDeprecated) and v:GetAttribute("Deprecated") then
-			v.Visible = false
-			continue
-		end
-		if (not showNonBrowsable) and v:GetAttribute("NonBrowsable") then
-			v.Visible = false
 			continue
 		end
 		if v.Name:lower():match(text) then
