@@ -170,10 +170,9 @@ searchBar:GetPropertyChangedSignal("Text"):Connect(updateSearch)
 frame.Parent = widget
 
 local function convert(to: string): ()
-	local result = Convert.ConvertMany(Selection:Get(), to)
-	if result then
-		Selection:Set(result)
-	end
+	local lastSelection = Selection:Get()
+	local result = Convert.ConvertMany(lastSelection, to)
+	Selection:Set(result or lastSelection)
 end
 
 local function setIcon(imageLabel: ImageLabel, class: Reflection.Class): ()

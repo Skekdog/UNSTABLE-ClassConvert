@@ -55,7 +55,7 @@ function module.ConvertMany(from: {Instance}, to: string): {Instance}?
 	end
 
 	ChangeHistoryService:FinishRecording(recording, if success then Enum.FinishRecordingOperation.Commit else Enum.FinishRecordingOperation.Cancel)
-	return newInstances
+	return if success then newInstances else from
 end
 
 return module
