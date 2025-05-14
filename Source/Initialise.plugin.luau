@@ -14,5 +14,5 @@ local Widget = require("./Plugin/Widget")
 Widget.PopulateClasses()
 
 Toolbar.OnClick = function()
-	Widget.Widget.Enabled = true
+	Widget.ToggleWidget()
 end
