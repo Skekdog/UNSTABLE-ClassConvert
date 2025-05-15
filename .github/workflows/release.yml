@@ -38,7 +38,7 @@ jobs:
           token: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Build
-        run: rojo build plugin --output ClassConvert.rbxm
+        run: rojo build . --output ClassConvert.rbxm
 
       - name: Upload Artifact
         uses: actions/upload-artifact@v4
