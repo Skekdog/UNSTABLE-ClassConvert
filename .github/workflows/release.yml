@@ -18,8 +18,8 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
-          tag_name: ${{ github.run_number }}
-          release_name: ${{ github.ref }}
+          tag_name: v${{ github.run_number }}-${{ github.run_attempt }}
+          release_name: v${{ github.run_number }}-${{ github.run_attempt }}
           draft: false
           prerelease: false
 
@@ -37,6 +37,9 @@ jobs:
           path: /
           cache: true
           token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Add Tools to PATH
+        run: echo "$HOME/.rokit/bin" >> $GITHUB_PATH
 
       - name: Build
         run: rojo build plugin --output ClassConvert.rbxm
