@@ -34,12 +34,8 @@ jobs:
       - name: Setup Rokit
         uses: raild3x/setup-rokit@v0.1.0
         with:
-          path: /
           cache: true
           token: ${{ secrets.GITHUB_TOKEN }}
-
-      - name: Add Tools to PATH
-        run: echo "$HOME/.rokit/bin" >> $GITHUB_PATH
 
       - name: Build
         run: rojo build plugin --output ClassConvert.rbxm
