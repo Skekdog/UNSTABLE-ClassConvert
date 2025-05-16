@@ -1,5 +1,6 @@
 *.rbxmx
 *.rbxm
 sourcemap.json
-*.vscode
+.vscode/*
+!.vscode/settings.json
 Ignore/
